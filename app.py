@@ -116,4 +116,12 @@ if selected_day:
     if phase:
         st.markdown(f"### 📅 Day {selected_day} • {phase['phase']}")
         st.info(f"**Hormonal Landscape**\n\n{phase['hormonal_landscape']}")
-        st.warning(f"**Behavioral Insights
+        st.warning(f"**Behavioral Insights**\n\n{phase['behavior_insights']}")
+
+        st.success("**Professional Strategies**")
+        for strategy in phase["professional_strategies"]:
+            st.markdown(f"- {strategy}")
+
+        st.markdown("---")
+        st.subheader("📝 Energy Log")
+        st.text_area("How are you feeling today? Any symptoms or wins to note?", key=f"log_{selected_day}")
