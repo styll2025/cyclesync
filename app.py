@@ -1,13 +1,12 @@
 import streamlit as st
 import datetime
-import calendar
 
 # Load logic from the full phase data
 phase_data = [
     {
         "phase": "Menstruation",
         "days": list(range(1, 6)),
-        "color": "#F9D3D3",
+        "color": "#f28b82",
         "hormonal_landscape": "Low estrogen and progesterone",
         "behavior_insights": "Lower energy, increased introspection, reduced cognitive flexibility",
         "professional_strategies": [
@@ -20,7 +19,7 @@ phase_data = [
     {
         "phase": "Follicular",
         "days": list(range(6, 14)),
-        "color": "#D3E8F9",
+        "color": "#aecbfa",
         "hormonal_landscape": "Rising estrogen, low progesterone",
         "behavior_insights": "Increased dopamine activity, improved motivation, verbal fluency, and creativity",
         "professional_strategies": [
@@ -33,7 +32,7 @@ phase_data = [
     {
         "phase": "Ovulation",
         "days": list(range(14, 17)),
-        "color": "#D3F9D8",
+        "color": "#ccff90",
         "hormonal_landscape": "Peak estrogen, LH surge, slight progesterone increase",
         "behavior_insights": "High verbal ability, social acuity, and confidence",
         "professional_strategies": [
@@ -46,7 +45,7 @@ phase_data = [
     {
         "phase": "Luteal",
         "days": list(range(17, 29)),
-        "color": "#E9D3F9",
+        "color": "#d7aefb",
         "hormonal_landscape": "High progesterone, moderate estrogen",
         "behavior_insights": "Increased attention to detail, sensitivity, and emotional depth. PMS symptoms may arise",
         "professional_strategies": [
@@ -61,23 +60,29 @@ phase_data = [
 # App UI
 st.markdown("""
     <style>
-        .calendar-cell {
-            padding: 10px;
+        .calendar-box {
+            background: #fff;
             border-radius: 12px;
-            margin-bottom: 10px;
-            color: #333333;
+            padding: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .calendar-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70px;
+            width: 70px;
+            border-radius: 10px;
+            color: #333;
             font-weight: 500;
-            text-align: center;
+            margin: 4px;
         }
-        .cycle-day {
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-        .phase-label {
-            font-size: 12px;
-            border-radius: 8px;
-            padding: 4px 8px;
-            display: inline-block;
+        .calendar-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -89,38 +94,26 @@ st.markdown("Track your menstrual cycle and get tailored career guidance across 
 start_date = st.date_input("Select the first day of your current cycle:", datetime.date.today())
 cycle_length = st.slider("Cycle Length (days)", 24, 35, 28)
 
-# Display an interactive calendar grid
 st.subheader("🗓️ Cycle Calendar")
 selected_day = None
-cols = st.columns(7)
+
+st.markdown("<div class='calendar-box'><div class='calendar-grid'>", unsafe_allow_html=True)
 
 for i in range(cycle_length):
     day_num = i + 1
     phase = next((p for p in phase_data if day_num in p["days"]), None)
     if phase:
-        with cols[i % 7]:
-            button_clicked = st.button(f"Day {day_num}", key=f"day_{day_num}")
-            st.markdown(
-                f"<div class='calendar-cell' style='background-color:{phase['color']}'>"
-                f"<div class='phase-label'>{phase['phase']}</div>"
-                f"</div>",
-                unsafe_allow_html=True
-            )
-            if button_clicked:
-                selected_day = day_num
+        color = phase['color']
+        if st.button(f"{day_num}", key=f"btn_{day_num}"):
+            selected_day = day_num
+        st.markdown(f"<div class='calendar-cell' style='background-color: {color}'>{day_num}<br><small>{phase['phase']}</small></div>", unsafe_allow_html=True)
+
+st.markdown("</div></div>", unsafe_allow_html=True)
 
 # Show insights for selected day
 if selected_day:
     phase = next((p for p in phase_data if selected_day in p["days"]), None)
     if phase:
-        st.markdown(f"### Day {selected_day}: {phase['phase']}")
-        st.markdown(f"**Hormonal Landscape:** {phase['hormonal_landscape']}")
-        st.markdown(f"**Behavioural Insights:** {phase['behavior_insights']}")
-
-        st.markdown("**Recommended Professional Strategies:**")
-        for strategy in phase["professional_strategies"]:
-            st.markdown(f"- {strategy}")
-
-        st.markdown("---")
-        st.subheader("📝 Energy Log")
-        st.text_area("How are you feeling today? Any symptoms or wins to note?", key=f"log_{selected_day}")
+        st.markdown(f"### 📅 Day {selected_day} • {phase['phase']}")
+        st.info(f"**Hormonal Landscape**\n\n{phase['hormonal_landscape']}")
+        st.warning(f"**Behavioral Insights
