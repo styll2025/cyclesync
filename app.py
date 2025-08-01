@@ -1,6 +1,6 @@
 import streamlit as st
 import datetime
-import json
+import calendar
 
 # Load logic from the full phase data
 phase_data = [
@@ -60,30 +60,32 @@ phase_data = [
 
 # App UI
 st.title("🌸 CycleSync Pro")
-st.markdown("Track your menstrual cycle and get tailored career guidance each day.")
+st.markdown("Track your menstrual cycle and get tailored career guidance across the entire cycle.")
 
 # Input cycle start date and length
 start_date = st.date_input("Select the first day of your current cycle:", datetime.date.today())
 cycle_length = st.slider("Cycle Length (days)", 24, 35, 28)
 
-today = datetime.date.today()
-day_diff = (today - start_date).days % cycle_length
-cycle_day = day_diff + 1
+# Generate calendar view with clickable days
+st.subheader("🗓️ Cycle Calendar")
+selected_day = st.number_input("Click a day to explore (1 to cycle length):", min_value=1, max_value=cycle_length, value=1)
 
-# Find phase data
-for phase in phase_data:
-    if cycle_day in phase["days"]:
-        current_phase = phase
-        break
+# Calculate selected day details
+def get_phase_for_day(day):
+    for phase in phase_data:
+        if day in phase["days"]:
+            return phase
+    return None
 
-# Display current phase info
-st.subheader(f"📅 Today is Day {cycle_day} of your cycle")
-st.markdown(f"**Phase:** `{current_phase['phase']}`")
-st.markdown(f"**Hormonal Landscape:** {current_phase['hormonal_landscape']}")
-st.markdown(f"**Behavioural Insights:** {current_phase['behavior_insights']}")
+phase = get_phase_for_day(selected_day)
+
+# Display selected day info
+st.markdown(f"### Day {selected_day}: {phase['phase']}")
+st.markdown(f"**Hormonal Landscape:** {phase['hormonal_landscape']}")
+st.markdown(f"**Behavioural Insights:** {phase['behavior_insights']}")
 
 st.markdown("**Recommended Professional Strategies:**")
-for strategy in current_phase["professional_strategies"]:
+for strategy in phase["professional_strategies"]:
     st.markdown(f"- {strategy}")
 
 # Optional: add journaling/energy log
