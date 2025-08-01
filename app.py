@@ -7,7 +7,7 @@ phase_data = [
     {
         "phase": "Menstruation",
         "days": list(range(1, 6)),
-        "color": "#FFCCCC",
+        "color": "#F9D3D3",
         "hormonal_landscape": "Low estrogen and progesterone",
         "behavior_insights": "Lower energy, increased introspection, reduced cognitive flexibility",
         "professional_strategies": [
@@ -20,7 +20,7 @@ phase_data = [
     {
         "phase": "Follicular",
         "days": list(range(6, 14)),
-        "color": "#CCE5FF",
+        "color": "#D3E8F9",
         "hormonal_landscape": "Rising estrogen, low progesterone",
         "behavior_insights": "Increased dopamine activity, improved motivation, verbal fluency, and creativity",
         "professional_strategies": [
@@ -33,7 +33,7 @@ phase_data = [
     {
         "phase": "Ovulation",
         "days": list(range(14, 17)),
-        "color": "#CCFFCC",
+        "color": "#D3F9D8",
         "hormonal_landscape": "Peak estrogen, LH surge, slight progesterone increase",
         "behavior_insights": "High verbal ability, social acuity, and confidence",
         "professional_strategies": [
@@ -46,7 +46,7 @@ phase_data = [
     {
         "phase": "Luteal",
         "days": list(range(17, 29)),
-        "color": "#E5CCFF",
+        "color": "#E9D3F9",
         "hormonal_landscape": "High progesterone, moderate estrogen",
         "behavior_insights": "Increased attention to detail, sensitivity, and emotional depth. PMS symptoms may arise",
         "professional_strategies": [
@@ -59,6 +59,29 @@ phase_data = [
 ]
 
 # App UI
+st.markdown("""
+    <style>
+        .calendar-cell {
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            color: #333333;
+            font-weight: 500;
+            text-align: center;
+        }
+        .cycle-day {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .phase-label {
+            font-size: 12px;
+            border-radius: 8px;
+            padding: 4px 8px;
+            display: inline-block;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("🌸 CycleSync Pro")
 st.markdown("Track your menstrual cycle and get tailored career guidance across the entire cycle.")
 
@@ -76,9 +99,15 @@ for i in range(cycle_length):
     phase = next((p for p in phase_data if day_num in p["days"]), None)
     if phase:
         with cols[i % 7]:
-            if st.button(f"Day {day_num}", key=f"day_{day_num}"):
+            button_clicked = st.button(f"Day {day_num}", key=f"day_{day_num}")
+            st.markdown(
+                f"<div class='calendar-cell' style='background-color:{phase['color']}'>"
+                f"<div class='phase-label'>{phase['phase']}</div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+            if button_clicked:
                 selected_day = day_num
-            st.markdown(f"<div style='background-color:{phase['color']}; padding: 4px; border-radius: 4px; text-align: center;'>{phase['phase']}</div>", unsafe_allow_html=True)
 
 # Show insights for selected day
 if selected_day:
