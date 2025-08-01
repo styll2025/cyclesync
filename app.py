@@ -66,29 +66,32 @@ st.markdown("Track your menstrual cycle and get tailored career guidance across 
 start_date = st.date_input("Select the first day of your current cycle:", datetime.date.today())
 cycle_length = st.slider("Cycle Length (days)", 24, 35, 28)
 
-# Generate calendar view with clickable days
+# Display an interactive calendar grid
 st.subheader("🗓️ Cycle Calendar")
-selected_day = st.number_input("Click a day to explore (1 to cycle length):", min_value=1, max_value=cycle_length, value=1)
+selected_day = None
+cols = st.columns(7)
 
-# Calculate selected day details
-def get_phase_for_day(day):
-    for phase in phase_data:
-        if day in phase["days"]:
-            return phase
-    return None
+for i in range(cycle_length):
+    day_num = i + 1
+    phase = next((p for p in phase_data if day_num in p["days"]), None)
+    if phase:
+        with cols[i % 7]:
+            if st.button(f"Day {day_num}", key=f"day_{day_num}"):
+                selected_day = day_num
+            st.markdown(f"<div style='background-color:{phase['color']}; padding: 4px; border-radius: 4px; text-align: center;'>{phase['phase']}</div>", unsafe_allow_html=True)
 
-phase = get_phase_for_day(selected_day)
+# Show insights for selected day
+if selected_day:
+    phase = next((p for p in phase_data if selected_day in p["days"]), None)
+    if phase:
+        st.markdown(f"### Day {selected_day}: {phase['phase']}")
+        st.markdown(f"**Hormonal Landscape:** {phase['hormonal_landscape']}")
+        st.markdown(f"**Behavioural Insights:** {phase['behavior_insights']}")
 
-# Display selected day info
-st.markdown(f"### Day {selected_day}: {phase['phase']}")
-st.markdown(f"**Hormonal Landscape:** {phase['hormonal_landscape']}")
-st.markdown(f"**Behavioural Insights:** {phase['behavior_insights']}")
+        st.markdown("**Recommended Professional Strategies:**")
+        for strategy in phase["professional_strategies"]:
+            st.markdown(f"- {strategy}")
 
-st.markdown("**Recommended Professional Strategies:**")
-for strategy in phase["professional_strategies"]:
-    st.markdown(f"- {strategy}")
-
-# Optional: add journaling/energy log
-st.markdown("---")
-st.subheader("📝 Energy Log")
-st.text_area("How are you feeling today? Any symptoms or wins to note?", key="energy_log")
+        st.markdown("---")
+        st.subheader("📝 Energy Log")
+        st.text_area("How are you feeling today? Any symptoms or wins to note?", key=f"log_{selected_day}")
